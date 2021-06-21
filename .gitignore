@@ -30,3 +30,18 @@
 *.exe
 *.out
 *.app
+
+# directories
+/.clangd/*
+.cmake/
+.cache/
+
+# other files
+.vcpkgroot
+*.sublime*
+tags
+.ycm_*
+compile_commands.json
+.cproject
+.project
+.DS_Store
