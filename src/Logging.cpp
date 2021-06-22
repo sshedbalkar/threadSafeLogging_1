@@ -1,7 +1,46 @@
 #include "Logging.h"
+
 #include <cstddef>
+#include <iostream>
 //
 namespace merci::logging {
+
+logger::logger(const logging_config_t&) { m_logLevel = log_level::INFO; }
+logger::~logger() {}
+void logger::log(const std::string&, const log_level) {}
+void logger::log(const std::string&) {}
+logger& logger::operator<<(
+    ManipFn manip) {    /// endl, flush, setw, setfill, etc.
+    manip(m_stream);
+
+    if (manip == static_cast<ManipFn>(std::flush) ||
+        manip == static_cast<ManipFn>(std::endl))
+        this->flush();
+
+    return *this;
+}
+
+logger& logger::operator<<(FlagsFn manip) {    /// setiosflags, resetiosflags
+    manip(m_stream);
+    return *this;
+}
+
+logger& logger::set_level(log_level e) {
+    m_logLevel = e;
+    return *this;
+}
+
+logger& logger::operator()(log_level e) { return set_level(e); }
+
+void logger::flush() {
+    log(m_stream.str(), m_logLevel);
+    //
+    lock.lock();
+    m_logLevel = log_level::TRACE;
+    m_stream.str(std::string());
+    m_stream.clear();
+    lock.unlock();
+}
 
 std::string timestamp() {
     // get the time
@@ -20,14 +59,20 @@ std::string timestamp() {
     return buffer;
 }
 
+std_out_logger::std_out_logger(const logging_config_t& config)
+    : logger(config),
+      levels(config.find("color") != config.end() ? colored : uncolored) {}
+
 void std_out_logger::log(const std::string& message, const log_level level) {
     if (level < LOG_LEVEL_CUTOFF) return;
+    //lock.lock();
     std::string output;
     output.reserve(message.length() + 64);
     output.append(timestamp());
     output.append(levels.find(level)->second);
     output.append(message);
-    output.push_back('\n');
+    // output.push_back('\n');
+    //lock.unlock();
     log(output);
 }
 
@@ -72,7 +117,7 @@ void file_logger::log(const std::string& message, const log_level level) {
     output.append(timestamp());
     output.append(uncolored.find(level)->second);
     output.append(message);
-    output.push_back('\n');
+    //output.push_back('\n');
     log(output);
 }
 
@@ -134,4 +179,4 @@ logger* logger_factory::produce(const logging_config_t& config) const {
     throw std::runtime_error("Couldn't produce logger for type: " +
                              type->second);
 }
-}
+}    // namespace merci::logging

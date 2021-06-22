@@ -7,14 +7,24 @@
 
 void work() {
     std::ostringstream s;
-    s << "hi my name is: " << std::this_thread::get_id();
+    s << "hi my name is1: " << std::this_thread::get_id();
     std::string id = s.str();
     for (size_t i = 0; i < 10; ++i) {
-        merci::logging::ERROR(id);
-        merci::logging::WARN(id);
-        merci::logging::INFO(id);
-        merci::logging::DEBUG(id);
-        merci::logging::TRACE(id);
+        //merci::logging::ERROR(id);
+        merci::logging::ERROR()
+            << "hi my name is2: " << std::this_thread::get_id() << std::endl;
+        //merci::logging::WARN(id);
+        merci::logging::WARN()
+            << "hi my name is2: " << std::this_thread::get_id() << std::endl;
+        //merci::logging::INFO(id);
+        merci::logging::INFO()
+            << "hi my name is2: " << std::this_thread::get_id() << std::endl;
+        //merci::logging::DEBUG(id);
+        merci::logging::DEBUG()
+            << "hi my name is2: " << std::this_thread::get_id() << std::endl;
+        //merci::logging::TRACE(id);
+        merci::logging::TRACE()
+            << "hi my name is2: " << std::this_thread::get_id() << std::endl;
     }
 }
 
