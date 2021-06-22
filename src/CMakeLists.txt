@@ -1,6 +1,6 @@
 
 # Add source files
-set(SOURCE_FILES main.cpp Logging.hpp)
+set(SOURCE_FILES main.cpp Logging.cpp)
 
 # message("CXX id: ${CMAKE_CXX_COMPILER_ID}")
 # If we build for windows systems, we also include the resource file

@@ -3,7 +3,7 @@
 #include <thread>
 #include <vector>
 
-#include "Logging.hpp"
+#include "Logging.h"
 
 void work() {
     std::ostringstream s;
