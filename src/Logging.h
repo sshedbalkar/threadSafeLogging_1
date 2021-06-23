@@ -75,22 +75,20 @@ class logger {
 
     template <class T>    // int, double, strings, etc
     logger& operator<<(const T& output) {
-        lock.lock();
         m_stream << output;
-        lock.unlock();
         return *this;
     }
     logger& operator<<(ManipFn manip);    /// endl, flush, setw, setfill, etc.
     logger& operator<<(FlagsFn manip);    /// setiosflags, resetiosflags
     logger& set_level(log_level e);
     logger& operator()(log_level e);
+    logger& startsync(bool safe);
     void flush();
 
    protected:
     std::mutex lock;
 
    private:
-    // TODO: Make m_stream thread-safe
     std::stringstream m_stream;
     log_level m_logLevel;
 };
@@ -162,23 +160,33 @@ inline void log(const std::string& message, const log_level level) {
 inline void log(const std::string& message) { get_logger().log(message); }
 
 // these standout when reading code
-inline logger& TRACE() { return get_logger().set_level(log_level::TRACE); }
+inline logger& TRACE() {
+    return get_logger().set_level(log_level::TRACE).startsync(true);
+}
 inline void TRACE(const std::string& message) {
     get_logger().log(message, log_level::TRACE);
 }
-inline logger& DEBUG() { return get_logger().set_level(log_level::DEBUG); }
+inline logger& DEBUG() {
+    return get_logger().set_level(log_level::DEBUG).startsync(true);
+}
 inline void DEBUG(const std::string& message) {
     get_logger().log(message, log_level::DEBUG);
 }
-inline logger& INFO() { return get_logger().set_level(log_level::INFO); }
+inline logger& INFO() {
+    return get_logger().set_level(log_level::INFO).startsync(true);
+}
 inline void INFO(const std::string& message) {
     get_logger().log(message, log_level::INFO);
 }
-inline logger& WARN() { return get_logger().set_level(log_level::WARN); }
+inline logger& WARN() {
+    return get_logger().set_level(log_level::WARN).startsync(true);
+}
 inline void WARN(const std::string& message) {
     get_logger().log(message, log_level::WARN);
 }
-inline logger& ERROR() { return get_logger().set_level(log_level::ERROR); }
+inline logger& ERROR() {
+    return get_logger().set_level(log_level::ERROR).startsync(true);
+}
 inline void ERROR(const std::string& message) {
     get_logger().log(message, log_level::ERROR);
 }

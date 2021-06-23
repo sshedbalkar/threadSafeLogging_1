@@ -14,8 +14,10 @@ logger& logger::operator<<(
     manip(m_stream);
 
     if (manip == static_cast<ManipFn>(std::flush) ||
-        manip == static_cast<ManipFn>(std::endl))
+        manip == static_cast<ManipFn>(std::endl)) {
         this->flush();
+        startsync(false);
+    }
 
     return *this;
 }
@@ -35,11 +37,17 @@ logger& logger::operator()(log_level e) { return set_level(e); }
 void logger::flush() {
     log(m_stream.str(), m_logLevel);
     //
-    lock.lock();
     m_logLevel = log_level::TRACE;
     m_stream.str(std::string());
     m_stream.clear();
-    lock.unlock();
+}
+
+logger& logger::startsync(bool safe) {
+    if (safe)
+        lock.lock();
+    else
+        lock.unlock();
+    return *this;
 }
 
 std::string timestamp() {
@@ -65,14 +73,14 @@ std_out_logger::std_out_logger(const logging_config_t& config)
 
 void std_out_logger::log(const std::string& message, const log_level level) {
     if (level < LOG_LEVEL_CUTOFF) return;
-    //lock.lock();
+    // lock.lock();
     std::string output;
     output.reserve(message.length() + 64);
     output.append(timestamp());
     output.append(levels.find(level)->second);
     output.append(message);
     // output.push_back('\n');
-    //lock.unlock();
+    // lock.unlock();
     log(output);
 }
 
@@ -117,7 +125,7 @@ void file_logger::log(const std::string& message, const log_level level) {
     output.append(timestamp());
     output.append(uncolored.find(level)->second);
     output.append(message);
-    //output.push_back('\n');
+    // output.push_back('\n');
     log(output);
 }
 
